@@ -80,7 +80,7 @@ model.add(Dense(units = 1))
 
 model.compile(loss='mse', optimizer='adam')
 model.summary()
-model.fit(x_train, y_train, epochs=30, batch_size=16)
+model.fit(x_train, y_train, epochs=100, batch_size=16)
 model.save('saved_model/MODEL2')
 
 data_test = np.array(data_test)
