@@ -10,14 +10,14 @@ from sklearn.preprocessing import MinMaxScaler
 x_scaler = MinMaxScaler()
 y_scaler = MinMaxScaler()
 
-pred_len = 60
+pred_len = 12
 col_list = ['unix', 'symbol', 'open', 'high', 'low', 'close', 'Volume BTC', 'Volume USDT', 'tradecount','values','mindate']
 df = pd.read_csv('./data/Binance_BTCUSDT_minute.csv', index_col='mindate', usecols=col_list,
                  low_memory=False, parse_dates=True)
 df.drop(['symbol'], inplace=True, axis=1)
 df = df.astype('float')
 
-data_test = df.loc['2022-01-01':'2022-03-14 07:30']['values']
+data_test = df.loc['2022-01-01':'2022-02-26 11:56']['values']
 data_test = np.array(data_test)
 data_test = data_test[::-1]
 
@@ -40,7 +40,7 @@ print(y_pred[:][-1])
 
 # making future predictions by predicting a few times
 future_pred = []
-for i in range(0, pred_len):
+for i in range(0, 5*pred_len):
     print(i)
     y_pred = x_scaler.transform(y_pred)
     y_pred = model.predict(y_pred)

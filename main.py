@@ -7,14 +7,14 @@ from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Activation
-
+print(tf.test.gpu_device_name())
 print(tf.__version__)
 print(tf.config.list_physical_devices())
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 x_scaler = MinMaxScaler()
 y_scaler = MinMaxScaler()
-pred_length = 60
+pred_length = 12
 
 col_list = ['unix', 'symbol', 'open', 'high', 'low', 'close', 'Volume BTC', 'Volume USDT', 'tradecount','values','mindate']
 df = pd.read_csv('./data/Binance_BTCUSDT_minute.csv', index_col='mindate', usecols=col_list,
@@ -58,13 +58,29 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 x_train = x_train.reshape(len(x_train[:]), len(x_train[0]), 1)
 print(x_train.shape)
 model = Sequential()
-model.add(LSTM(units=256, activation='relu', input_shape=(pred_length, 1)))
-model.add(Dense(pred_length))
-model.add(Dense(pred_length))
+#model.add(LSTM(units=256, activation='relu', input_shape=(pred_length, 1),return_sequences=True))
+#model.add(Dense(pred_length))
+#model.add(Dense(pred_length))
+#model.add(Dense(pred_length))
 #model.add(Dense(1))
+
+model.add(LSTM(units = 50, return_sequences = True, input_shape=(pred_length, 1)))
+model.add(Dropout(0.2))
+
+model.add(LSTM(units = 50, return_sequences = True))
+model.add(Dropout(0.2))
+
+model.add(LSTM(units = 50, return_sequences = True))
+model.add(Dropout(0.2))
+
+model.add(LSTM(units = 50, return_sequences = True))
+model.add(Dropout(0.2))
+
+model.add(Dense(units = 1))
+
 model.compile(loss='mse', optimizer='adam')
 model.summary()
-model.fit(x_train, y_train, epochs=1, batch_size=1)
+model.fit(x_train, y_train, epochs=30, batch_size=16)
 model.save('saved_model/MODEL2')
 
 data_test = np.array(data_test)
@@ -85,9 +101,12 @@ x_test = x_test.reshape(len(x_test[:]), len(x_test[0]), 1)
 
 y_test = y_scaler.transform(y_test)
 y_test = y_test.reshape(len(y_test[:]), len(y_test[0]), 1)
-
+print(x_test.shape)
+print(y_test.shape)
 y_pred = model.predict(y_test)
 print(y_pred.shape)
+print(len(y_test[:]))
+print(y_pred)
 y_pred = y_pred.reshape(len(y_test[:]), len(y_test[0]))
 print(y_pred.shape)
 y_pred = y_scaler.inverse_transform(y_pred)
