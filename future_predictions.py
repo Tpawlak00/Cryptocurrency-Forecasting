@@ -17,7 +17,7 @@ df = pd.read_csv('./data/Binance_BTCUSDT_minute.csv', index_col='mindate', useco
 df.drop(['symbol'], inplace=True, axis=1)
 df = df.astype('float')
 
-data_test = df.loc['2022-01-01':'2022-02-28 07:48']['values']
+data_test = df.loc['2022-01-01':'2022-02-26 11:56']['values']
 data_test = np.array(data_test)
 data_test = data_test[::-1]
 
