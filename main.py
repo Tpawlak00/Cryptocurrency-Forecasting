@@ -6,6 +6,8 @@ x_scaler = MinMaxScaler()
 y_scaler = MinMaxScaler()
 pred_length = 12
 
+
+
 def get_data(file):
     col_list = ['unix', 'symbol', 'open', 'high', 'low', 'close', 'Volume BTC', 'Volume USDT', 'tradecount', 'values',
                 'mindate']
