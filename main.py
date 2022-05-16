@@ -7,7 +7,6 @@ y_scaler = MinMaxScaler()
 pred_length = 12
 
 
-
 def get_data(file):
     col_list = ['unix', 'symbol', 'open', 'high', 'low', 'close', 'Volume BTC', 'Volume USDT', 'tradecount', 'values',
                 'mindate']
@@ -81,6 +80,8 @@ def split_test_data():
 
 def scale_train_data():
     inputs, labels = split_train_data()
+    print(inputs)
+    print(labels)
     inputs = x_scaler.fit_transform(inputs)
     labels = y_scaler.fit_transform(labels)
 
@@ -89,7 +90,6 @@ def scale_train_data():
 
 def scale_test_data():
     inputs = split_test_data()
-    print(inputs)
     inputs = x_scaler.fit_transform(inputs)
 
     return inputs

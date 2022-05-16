@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
-from main import scale_test_data, inverse_scaler, pred_length, get_data
+from main import scale_test_data, inverse_scaler, pred_length, get_data, scale_train_data
 
 
 def get_plot_values(filename):
@@ -43,7 +43,7 @@ def make_predictions():
     y_pred = inverse_scaler(y_pred)
 
     y_pred = np.array(y_pred)
-
+    print(y_pred)
     predictions_list = []
     for i in range(0, len(y_pred)):
         for j in range(0, len(y_pred[0])):
