@@ -27,7 +27,7 @@ def get_train_values():
 
 def get_test_values():
     data = get_data('./data/Binance_BTCUSDT_minute2.csv')
-    test = data.loc['2022-03-18':]['values']
+    test = data.loc['2022-03-18 00:00':'2022-03-18 01:00']['values']
 
     return test
 
@@ -50,14 +50,12 @@ def split_train_data():
     data_train = make_train_dataset()
 
     x_train, y_train = [], []
-    for i in range(0, len(data_train) - 2*pred_length + 1, pred_length):
+    for i in range(0, len(data_train) - pred_length):
         x_train.append(data_train[i:i + pred_length])
 
-    for i in range(pred_length, len(data_train) - pred_length + 1, pred_length):
+    for i in range(1, len(data_train) - pred_length + 1):
         y_train.append(data_train[i:i + pred_length])
 
-    print(pd.DataFrame(x_train))
-    print(pd.DataFrame(y_train))
     x_train, y_train = np.array(x_train), np.array(y_train)
     print(x_train.shape, y_train.shape)
 
@@ -68,7 +66,7 @@ def split_test_data():
     data_test = make_test_dataset()
 
     x_test = []
-    for i in range(0, len(data_test) - pred_length + 1, pred_length):
+    for i in range(0, len(data_test) - pred_length):
         x_test.append(data_test[i:i + pred_length])
 
     print(pd.DataFrame(x_test))
@@ -80,8 +78,6 @@ def split_test_data():
 
 def scale_train_data():
     inputs, labels = split_train_data()
-    print(inputs)
-    print(labels)
     inputs = x_scaler.fit_transform(inputs)
     labels = y_scaler.fit_transform(labels)
 
@@ -89,8 +85,9 @@ def scale_train_data():
 
 
 def scale_test_data():
+    _, _ = scale_train_data()
     inputs = split_test_data()
-    inputs = x_scaler.fit_transform(inputs)
+    inputs = x_scaler.transform(inputs)
 
     return inputs
 
