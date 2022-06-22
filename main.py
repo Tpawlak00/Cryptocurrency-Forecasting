@@ -1,105 +1,76 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder
 
 scaler = MinMaxScaler()
-pred_length = 1440  # 5 days
-path = './data/BTC_minute.csv'
+pred_length = 4  # 5 days
+path = './drive/MyDrive/BTC_minute.csv'
+encoder = OneHotEncoder()
 
-def get_data(file):
+
+def make_dataset(file):
     col_list = ['price', 'date', 'target']
     df = pd.read_csv(file, index_col='date', usecols=col_list,
                      low_memory=False, parse_dates=True)
     df['price'] = df['price'].astype('float')
     df['target'] = df['target'].astype('int')
-    print(df)
 
-    return df
+    train_targets = df['target']
 
+    y_train = ['Hold']
 
-def get_train_values():
-    data = get_data(path)
-    train_labels = data.loc['2020-03-16 23:35':'2021-12-31 23:55']['price']
-    train_targets = data.loc['2020-03-16 23:35':'2021-12-31 23:55']['target']
-
-    return train_labels, train_targets
-
-
-def get_test_values():
-    data = get_data(path)
-    test = data.loc['2022']['price']
-
-    return test
-
-
-def make_test_dataset():
-    test = get_test_values()
-    test = np.array(test[::-1])
-
-    return test
-
-
-def make_train_dataset():
-    train_inputs, train_targets = get_train_values()
-    train_inputs = np.array(train_inputs[::-1])
-    train_targets = np.array(train_targets[::-1])
-
-    y_train = []
-    y_train.append([0, 1, 0])
-
-    for i in range(0, len(train_targets)-1):
+    for i in range(0, len(train_targets) - 1):
         if train_targets[i] < train_targets[i + 1]:
-            y_train.append([1,0,0])
+            y_train.append('Sell')
         elif train_targets[i] == train_targets[i + 1]:
-            y_train.append([0,1,0])
+            y_train.append('Hold')
         elif train_targets[i] > train_targets[i + 1]:
-            y_train.append([0,0,1])
+            y_train.append('Buy')
 
-    return train_inputs, y_train
+    df['target'] = y_train
 
+    encoder_df = pd.DataFrame(encoder.fit_transform(df[['target']]).toarray(), index=df.index)
 
-def split_train_data():
-    inputs, targets = make_train_dataset()
-
-    x_train, y_train = [], []
-    for i in range(0, len(inputs) - pred_length):
-        x_train.append(inputs[i:i + pred_length])
-
-    for i in range(pred_length, len(targets)):
-        y_train.append(targets[i])
-
-    x_train, y_train = np.array(x_train), np.array(y_train)
-
-    print('Inputs shape:', x_train.shape, 'targets shape:', y_train.shape)
-
-    return x_train, y_train
+    return df, encoder_df
 
 
-def split_test_data():
-    data_test = make_test_dataset()
+def split_data():
+    inputs, outputs = make_dataset(path)
+    x_train, y_train = inputs['3/16/2020  23:35:00':'12/31/2021  23:55:00']['price'], outputs[
+                                                                                       '3/16/2020  23:35:00':'12/31/2021  23:55:00']
+    x_test, y_test = inputs['2022']['price'], outputs['2022']
 
-    x_test = []
-    for i in range(0, len(data_test) - pred_length):
-        x_test.append(data_test[i:i + pred_length])
+    x_train = np.array(x_train[::-1])
 
-    print(pd.DataFrame(x_test))
-    x_test = np.array(x_test)
-    print(x_test.shape)
+    y_train = np.array(y_train)
+    y_train = np.flip(y_train)
+    y_train = y_train[pred_length - 1:]
 
-    return x_test
+    x_test = np.array(x_test[::-1])
+
+    y_test = np.array(y_test)
+    y_test = np.flip(y_test)
+    y_test = y_test[pred_length - 1:]
+
+    x_train_out, x_test_out = [], []
+    for i in range(0, len(x_train) - pred_length + 1):
+        x_train_out.append(x_train[i:i + pred_length])
+
+    for i in range(0, len(x_test) - pred_length + 1):
+        x_test_out.append(x_test[i:i + pred_length])
+
+    x_train_out, x_test_out = np.array(x_train_out), np.array(x_test_out)
+
+    return x_train_out, y_train, x_test_out, y_test
 
 
-def scale_train_data():
-    inputs, labels = split_train_data()
-    inputs = scaler.fit_transform(inputs)
-    print(pd.DataFrame(inputs))
-    print(pd.DataFrame(labels))
-    return inputs, labels
+def scale_data():
+    inputs_train, outputs_train, inputs_test, outputs_test = split_data()
+    inputs_train = scaler.fit_transform(inputs_train)
+    inputs_test = scaler.transform(inputs_test)
 
+    inputs_train = inputs_train.reshape(len(inputs_train), pred_length, 1)
+    inputs_test = inputs_test.reshape(len(inputs_test), pred_length, 1)
 
-def scale_test_data():
-    _, _ = scale_train_data()
-    inputs = split_test_data()
-    inputs = scaler.transform(inputs)
-
-    return inputs
+    return inputs_train, outputs_train, inputs_test, outputs_test
