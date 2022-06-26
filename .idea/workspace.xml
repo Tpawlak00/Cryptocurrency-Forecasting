@@ -5,10 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/future_predictions.py" beforeDir="false" afterPath="$PROJECT_DIR$/future_predictions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saved_model/Conv_6_18_22/keras_metadata.pb" beforeDir="false" afterPath="$PROJECT_DIR$/saved_model/Conv_6_18_22/keras_metadata.pb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saved_model/Conv_6_18_22/saved_model.pb" beforeDir="false" afterPath="$PROJECT_DIR$/saved_model/Conv_6_18_22/saved_model.pb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saved_model/Conv_6_18_22/variables/variables.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/saved_model/Conv_6_18_22/variables/variables.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saved_model/Conv_6_18_22/variables/variables.index" beforeDir="false" afterPath="$PROJECT_DIR$/saved_model/Conv_6_18_22/variables/variables.index" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

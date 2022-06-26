@@ -4,8 +4,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import OneHotEncoder
 
 scaler = MinMaxScaler()
-pred_length = 4  # 5 days
-path = './drive/MyDrive/BTC_minute.csv'
+pred_length = 12  # 5 days
+path = './data/BTC_minute.csv'
 encoder = OneHotEncoder()
 
 
