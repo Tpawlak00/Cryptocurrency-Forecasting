@@ -1,0 +1,2 @@
+This project is supposed to forecast a few days into future of cryptocurrency. Data is passed by seq-seq method.
+6.3.22 Program succesfully predicted values for the first 2 weeks of March for Litecoin.
