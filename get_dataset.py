@@ -4,11 +4,12 @@ import tensorflow as tf
 
 pred_length = 12
 
+
 def read_file(file_path):
-  col_list = ['price', 'date', 'target','AVG']
-  df = pd.read_csv(file_path, index_col='date', usecols=col_list,
-                   low_memory=False, parse_dates=True)
-  return df
+    col_list = ['price', 'date', 'target', 'AVG']
+    df = pd.read_csv(file_path, index_col='date', usecols=col_list,
+                     low_memory=False, parse_dates=True)
+    return df
 
 
 def one_hot(df, start_train, end_train, start_test):
@@ -41,23 +42,23 @@ def one_hot(df, start_train, end_train, start_test):
 
     return encoded_val, encoded_test
 
+
 def split_data(df, start_train, end_train, start_test):
-  train_data = df[start_train:end_train]
-  test_data = df[start_test:]
+    train_data = df[start_train:end_train]
+    test_data = df[start_test:]
 
-  train_numpy = np.array(train_data[::-1])
-  test_numpy = np.array(test_data[::-1])
+    train_numpy = np.array(train_data[::-1])
+    test_numpy = np.array(test_data[::-1])
 
-  x_train = []
-  for i in range(0, len(train_numpy)-pred_length):
-    x_train.append(train_numpy[i:i + pred_length])
+    x_train = []
+    for i in range(0, len(train_numpy) - pred_length):
+        x_train.append(train_numpy[i:i + pred_length])
 
-  x_test = []
-  for i in range(0, len(test_numpy)-pred_length):
-    x_test.append(test_numpy[i:i + pred_length])
+    x_test = []
+    for i in range(0, len(test_numpy) - pred_length):
+        x_test.append(test_numpy[i:i + pred_length])
 
-  x_train = np.array(x_train)
-  x_test = np.array(x_test)
+    x_train = np.array(x_train)
+    x_test = np.array(x_test)
 
-  return x_train, x_test
-
+    return x_train, x_test

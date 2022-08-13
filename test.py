@@ -62,11 +62,12 @@ def plot(path, test_data):
     plot_data = plot_data[2000:]
     sell_list = []
     buy_list = []
+    print(len(pred))
     print(len(plot_data))
-    for i in range(13, len(plot_data)):
-        if np.all(pred[i - 13] == [1, 0, 0]):
+    for i in range(60, len(plot_data)):
+        if np.all(pred[i-60] == [1, 0, 0]):
             sell_list.append(plot_data.index[i])
-        if np.all(pred[i - 13] == [0, 0, 1]):
+        if np.all(pred[i-60] == [0, 0, 1]):
             buy_list.append(plot_data.index[i])
 
     fig = plt.figure(figsize=(50, 25))
@@ -84,6 +85,7 @@ def plot(path, test_data):
         plot_data[buy_list] - 5,
         '^', markersize=7, color='green'
     )
+    plt.show()
 
 
 if __name__ == "__main__":
