@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-from get_dataset import read_file, one_hot, split_data
+from get_dataset import read_file, split_data
 
 path = './data/BTC_minute.csv'
 model_path = './saved_model/Conv.h5'
