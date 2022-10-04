@@ -13,6 +13,16 @@ def make_folder(date1, date2):
     os.mkdir(folder_path)
     return folder_path
 
+def model_checkpoint(model_path):
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=f'{model_path}/Conv.h5',
+        save_weights_only=False,
+        monitor='accuracy',
+        mode='max',
+        save_best_only=True,
+        verbose=0)
+    return model_checkpoint_callback
+
 if __name__ == "__main__":
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     path = f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55'
@@ -20,14 +30,13 @@ if __name__ == "__main__":
     start_new = datetime(2021, 1, 1, 0, 0)
     end_new = datetime(2021, 1, 8, 0, 0)
 
-    for i in range(0, len(inputs), 288):
+    for i in range(0, len(inputs), 864):
         x_train, y_train = inputs[i:2016+i], outputs[i:2016+i]
         model = tf.keras.models.load_model(f'{path}/Conv.h5')
         path = make_folder(start_new, end_new)
-        history = model.fit(x_train, y_train, epochs=150, batch_size=16,
+        history = model.fit(x_train, y_train, epochs=400, batch_size=16,
                             validation_split=0.2,
-                            verbose=1)
-        model.save(f'{path}/Conv.h5')
+                            verbose=1, callbacks=[model_checkpoint(path)])
 
         plt.plot(history.history['accuracy'])
         plt.title('model accuracy')
@@ -61,5 +70,5 @@ if __name__ == "__main__":
         plt.savefig(f'{path}/val_loss')
         plt.clf()
 
-        start_new = start_new + timedelta(hours=24)
-        end_new = end_new + timedelta(hours=24)
+        start_new = start_new + timedelta(hours=72)
+        end_new = end_new + timedelta(hours=72)

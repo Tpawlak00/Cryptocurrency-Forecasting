@@ -65,7 +65,7 @@ if __name__ == "__main__":
     model = tf.keras.models.load_model(f'{path}/Conv.h5')
     print(len(inputs))
     print(len(outputs))
-    history = model.fit(inputs, outputs, epochs=500, batch_size=16,
+    history = model.fit(inputs, outputs, epochs=10000, batch_size=512,
                         validation_split=0.2,
                         verbose=1,
                         callbacks=[model_checkpoint(path)])
