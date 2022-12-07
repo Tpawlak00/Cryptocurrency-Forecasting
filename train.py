@@ -10,19 +10,19 @@ file_name = "./data/BTC_2020.csv"
 def build_model():
     model_name = tf.keras.models.Sequential()
 
-    model_name.add(tf.keras.layers.Conv1D(32, 2, input_shape=(pred_length, 1)))
+    model_name.add(tf.keras.layers.Conv1D(128, 3, input_shape=(pred_length, 1)))
+    model_name.add(tf.keras.layers.Dropout(0.2))
     # model.add(tf.keras.layers.AveragePooling1D(2))
-    model_name.add(tf.keras.layers.LSTM(16))
+    model_name.add(tf.keras.layers.LSTM(128))
     # model_name.add(tf.keras.layers.Flatten())
 
-    model_name.add(tf.keras.layers.Dense(16, activation='relu'))
-    # model.add(tf.keras.layers.Dropout(0.2))
-    model_name.add(tf.keras.layers.Dense(16, activation='relu'))
-    model_name.add(tf.keras.layers.BatchNormalization())
-    # model.add(tf.keras.layers.Dropout(0.2))
     model_name.add(tf.keras.layers.Dense(64, activation='relu'))
-    model_name.add(tf.keras.layers.Dense(32, activation='relu'))
-    model_name.add(tf.keras.layers.BatchNormalization())
+    # model_name.add(tf.keras.layers.Dropout(0.6))
+    # model_name.add(tf.keras.layers.Dense(16, activation='relu'))
+    # model_name.add(tf.keras.layers.BatchNormalization())
+    # model_name.add(tf.keras.layers.Dense(64, activation='relu'))
+    # model_name.add(tf.keras.layers.Dense(32, activation='relu'))
+    # model_name.add(tf.keras.layers.BatchNormalization())
     # model.add(tf.keras.layers.Dropout(0.5))
 
     model_name.add(tf.keras.layers.Dense(3, activation='softmax'))
@@ -58,14 +58,14 @@ if __name__ == "__main__":
 
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     path = f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55'
-    # os.mkdir(path)
+    os.mkdir(path)
 
     inputs, outputs = scale_data(file_name)
-    # model = build_model()
-    model = tf.keras.models.load_model(f'{path}/Conv.h5')
+    model = build_model()
+    # model = tf.keras.models.load_model(f'{path}/Conv.h5')
     print(len(inputs))
     print(len(outputs))
-    history = model.fit(inputs, outputs, epochs=10000, batch_size=512,
+    history = model.fit(inputs, outputs, epochs=700, batch_size=512,
                         validation_split=0.2,
                         verbose=1,
                         callbacks=[model_checkpoint(path)])
@@ -101,51 +101,5 @@ if __name__ == "__main__":
     plt.legend(['train'], loc='upper left')
     plt.savefig(f'{path}/val_loss')
     plt.clf()
-
-    # x_train, y_train = scaled_x[83080:], scaled_y[83080:]
-    #
-    # for i in range(0, len(x_train), 144):
-    #     model = tf.keras.models.load_model(f'{path}/Conv.h5')
-    #     path = make_folder(start_new, end_new)
-    #     history = model.fit(x_train[i:2016+i], y_train[i:2016+i], epochs=100, batch_size=16,
-    #                         validation_split=0.2,
-    #                         verbose=1,
-    #                         callbacks=[model_checkpoint(path)])
-    #
-    #     plt.plot(history.history['accuracy'])
-    #     plt.title('model accuracy')
-    #     plt.ylabel('accuracy')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train'], loc='upper left')
-    #     plt.savefig(f'{path}/accuracy')
-    #     plt.clf()
-    #
-    #     plt.plot(history.history['loss'])
-    #     plt.title('model loss')
-    #     plt.ylabel('loss')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train'], loc='upper left')
-    #     plt.savefig(f'{path}/loss')
-    #     plt.clf()
-    #
-    #     plt.plot(history.history['val_accuracy'])
-    #     plt.title('model accuracy')
-    #     plt.ylabel('accuracy')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train'], loc='upper left')
-    #     plt.savefig(f'{path}/val_acc')
-    #     plt.clf()
-    #
-    #     plt.plot(history.history['val_loss'])
-    #     plt.title('model loss')
-    #     plt.ylabel('loss')
-    #     plt.xlabel('epoch')
-    #     plt.legend(['train'], loc='upper left')
-    #     plt.savefig(f'{path}/val_loss')
-    #     plt.clf()
-    #     print(path)
-    #
-    #     start_new = start_new + timedelta(hours=12)
-    #     end_new = end_new + timedelta(hours=12)
 
     print('done')
