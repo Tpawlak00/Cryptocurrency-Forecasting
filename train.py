@@ -10,13 +10,14 @@ file_name = "./data/BTC_2020.csv"
 def build_model():
     model_name = tf.keras.models.Sequential()
 
-    model_name.add(tf.keras.layers.Conv1D(128, 3, input_shape=(pred_length, 1)))
+    model_name.add(tf.keras.layers.Conv1D(256, 3, input_shape=(pred_length, 1)))
     model_name.add(tf.keras.layers.Dropout(0.2))
-    # model.add(tf.keras.layers.AveragePooling1D(2))
+    model_name.add(tf.keras.layers.Dense(128, activation='relu'))
     model_name.add(tf.keras.layers.LSTM(128))
+    model_name.add(tf.keras.layers.Dropout(0.4))
     # model_name.add(tf.keras.layers.Flatten())
 
-    model_name.add(tf.keras.layers.Dense(64, activation='relu'))
+    model_name.add(tf.keras.layers.Dense(128, activation='relu'))
     # model_name.add(tf.keras.layers.Dropout(0.6))
     # model_name.add(tf.keras.layers.Dense(16, activation='relu'))
     # model_name.add(tf.keras.layers.BatchNormalization())
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     # model = tf.keras.models.load_model(f'{path}/Conv.h5')
     print(len(inputs))
     print(len(outputs))
-    history = model.fit(inputs, outputs, epochs=700, batch_size=512,
+    history = model.fit(inputs, outputs, epochs=1000, batch_size=512,
                         validation_split=0.2,
                         verbose=1,
                         callbacks=[model_checkpoint(path)])

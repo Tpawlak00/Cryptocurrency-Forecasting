@@ -83,9 +83,9 @@ def calculate_earnings(dataframe, outputs, predictions, buy_prob, sell_prob):
         max_bot_val = np.max(predictions[i])
         # Find index position of maximum value using where()
         max_bot_index = np.where(predictions[i] == max_bot_val)[0]
-        if max_bot_index == 0 and max_bot_val > buy_prob:
+        if max_bot_index == 0 and max_bot_val > sell_prob:
             bot_actions.append("S")
-        elif max_bot_index == 2 and max_bot_val > sell_prob:
+        elif max_bot_index == 2 and max_bot_val > buy_prob:
             bot_actions.append("B")
         else:
             bot_actions.append("H")
@@ -132,6 +132,7 @@ def calculate_earnings(dataframe, outputs, predictions, buy_prob, sell_prob):
             continue
 
     df_check["bot earnings"] = bot_earnings
+    print(df_check["bot earnings"][-1])
 
     accuracy = df_check["bot earnings"][-1] / df_check["estimated earnings"][-1]
     # d1 = datetime.strptime(df_check.index[0], '%Y-%m-%d %H:%M:%S')
@@ -178,7 +179,7 @@ def plot_bar_prob(df_bar, pred):
 
     return df_bar
 
-def filter(pred_array):
+def filter(pred_array, buy_prob, sell_prob):
     for i in range(len(pred_array)):
         # get index of max value
         max_val = np.max(pred_array[i])
@@ -187,20 +188,15 @@ def filter(pred_array):
         sort_values = np.sort(pred_array[i])[::-1]
 
         # if max value is greater by 0.7 than the rest of values set categories
-        if max_val > 0.45:
-            if max_index == 0:
-                pred_array[i] = [1, 0, 0]
-            elif max_index == 1:
-                pred_array[i] = [0, 1, 0]
-            elif max_index == 2:
-                pred_array[i] = [0, 0, 1]
-        # else choose "hold" option
+        if max_index == 0 and max_val >= sell_prob:
+            pred_array[i] = [1, 0, 0]
+        elif max_index == 1:
+            pred_array[i] = [0, 1, 0]
+        elif max_index == 2 and max_val >= buy_prob:
+            pred_array[i] = [0, 0, 1]
         else:
             pred_array[i] = [0, 1, 0]
 
-    print(sum((pred_array == [1, 0, 0]).all(1)))
-    print(sum((pred_array == [0, 1, 0]).all(1)))
-    print(sum((pred_array == [0, 0, 1]).all(1)))
     return pred_array
 
 def plot_decisions(path, pred_list):
@@ -211,7 +207,8 @@ def plot_decisions(path, pred_list):
     data = data.set_index('date')
     # data['date'] = pd.to_datetime(data['date'].dt.strftime('%m/%d/%Y'))
     plot_data = data['value']
-    plot_data = plot_data[2016:]
+    plot_data = plot_data[2592:2880]
+    print(pd.DataFrame(plot_data))
     sell_list = []
     buy_list = []
     for i in range(12, len(plot_data)):
@@ -231,8 +228,13 @@ def plot_decisions(path, pred_list):
     for i in range(len(buy_list)):
         buy_list_index.append(plot_data.index.get_loc(buy_list[i]))
 
+    plot_data.index = pd.to_datetime(plot_data.index).strftime('%H:%M')
+    sell_list = pd.to_datetime(sell_list).strftime('%H:%M')
+    buy_list = pd.to_datetime(buy_list).strftime('%H:%M')
 
-    plot_data.plot(x=plot_data.index, ax=ax1, x_compat=True)
+    plot_data.plot(x=plot_data.index, ax=ax1, rot=45, grid=True,
+              ylabel="Cena [$]", xlabel="Godzina [GG-MM]", title="Decyzje podjęte przez model dnia 28.09.2022",
+              legend=True, x_compat=True)
     ax1.plot(
         sell_list_index,
         plot_data[sell_list] + 5,
@@ -244,6 +246,7 @@ def plot_decisions(path, pred_list):
         plot_data[buy_list] - 5,
         '^', markersize=7, color='green'
     )
+    plt.legend(["Cena", "Sprzedaż", "Kupno"])
     plt.show()
 
 def plot(path, pred_list):
@@ -286,6 +289,7 @@ def plot(path, pred_list):
     print(buy_list)
     print(plot_data.index)
 
+
     plot_data.plot(x=plot_data.index,xlabel='Godzina [GG:MM]', ax=ax1, x_compat=True, rot=45,
                    grid=True, title='Oznaczenia kupna i sprzedaży bitcoina w dniu 26-09-2022')
     ax1.plot(
@@ -312,41 +316,41 @@ if __name__ == "__main__":
     inputs = df.to_numpy()
 
     x_train, _ = scale_data(file_name)
-    # model1 = tf.keras.models.load_model(f'./saved_model/From 01-01-2021 00-00 To 01-31-2021 00-00/Conv.h5')
-    # model2 = tf.keras.models.load_model(f'./saved_model/From 01-31-2021 00-00 To 03-02-2021 00-00/Conv.h5')
-    # model3 = tf.keras.models.load_model("./saved_model/From 03-02-2021 00-00 To 04-01-2021 00-00/Conv.h5")
-    # model4 = tf.keras.models.load_model(f'./saved_model/From 04-01-2021 00-00 To 05-01-2021 00-00/Conv.h5')
-    # model5 = tf.keras.models.load_model(f'./saved_model/From 05-01-2021 00-00 To 05-31-2021 00-00/Conv.h5')
+    model1 = tf.keras.models.load_model(f'./saved_model/From 01-01-2021 00-00 To 01-31-2021 00-00/Conv.h5')
+    model2 = tf.keras.models.load_model(f'./saved_model/From 01-31-2021 00-00 To 03-02-2021 00-00/Conv.h5')
+    model3 = tf.keras.models.load_model("./saved_model/From 03-02-2021 00-00 To 04-01-2021 00-00/Conv.h5")
+    model4 = tf.keras.models.load_model(f'./saved_model/From 04-01-2021 00-00 To 05-01-2021 00-00/Conv.h5')
+    model5 = tf.keras.models.load_model(f'./saved_model/From 05-01-2021 00-00 To 05-31-2021 00-00/Conv.h5')
     model6 = tf.keras.models.load_model(f'./saved_model/From 05-31-2021 00-00 To 06-30-2021 00-00/Conv.h5')
-    # model7 = tf.keras.models.load_model(f'./saved_model/From 06-30-2021 00-00 To 07-30-2021 00-00/Conv.h5')
-    # model8 = tf.keras.models.load_model(f'./saved_model/From 07-30-2021 00-00 To 08-29-2021 00-00/Conv.h5')
-    # model9 = tf.keras.models.load_model(f'./saved_model/From 08-29-2021 00-00 To 09-28-2021 00-00/Conv.h5')
-    # model10 = tf.keras.models.load_model(f'./saved_model/From 09-28-2021 00-00 To 10-28-2021 00-00/Conv.h5')
-    # model11 = tf.keras.models.load_model(f'./saved_model/From 10-28-2021 00-00 To 11-27-2021 00-00/Conv.h5')
-    # model12 = tf.keras.models.load_model(f'./saved_model/From 11-27-2021 00-00 To 12-27-2021 00-00/Conv.h5')
-    # model13 = tf.keras.models.load_model(f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55/Conv.h5')
+    model7 = tf.keras.models.load_model(f'./saved_model/From 06-30-2021 00-00 To 07-30-2021 00-00/Conv.h5')
+    model8 = tf.keras.models.load_model(f'./saved_model/From 07-30-2021 00-00 To 08-29-2021 00-00/Conv.h5')
+    model9 = tf.keras.models.load_model(f'./saved_model/From 08-29-2021 00-00 To 09-28-2021 00-00/Conv.h5')
+    model10 = tf.keras.models.load_model(f'./saved_model/From 09-28-2021 00-00 To 10-28-2021 00-00/Conv.h5')
+    model11 = tf.keras.models.load_model(f'./saved_model/From 10-28-2021 00-00 To 11-27-2021 00-00/Conv.h5')
+    model12 = tf.keras.models.load_model(f'./saved_model/From 11-27-2021 00-00 To 12-27-2021 00-00/Conv.h5')
+    model13 = tf.keras.models.load_model(f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55/Conv.h5')
 
-    # model1_pred = model1.predict(np.array(x_train))
-    # model2_pred = model2.predict(np.array(x_train))
-    # model3_pred = model3.predict(np.array(x_train))
-    # model4_pred = model4.predict(np.array(x_train))
-    # model5_pred = model5.predict(np.array(x_train))
+    model1_pred = model1.predict(np.array(x_train))
+    model2_pred = model2.predict(np.array(x_train))
+    model3_pred = model3.predict(np.array(x_train))
+    model4_pred = model4.predict(np.array(x_train))
+    model5_pred = model5.predict(np.array(x_train))
     model6_pred = model6.predict(np.array(x_train))
-    # model7_pred = model7.predict(np.array(x_train))
-    # model8_pred = model8.predict(np.array(x_train))
-    # model9_pred = model9.predict(np.array(x_train))
-    # model10_pred = model10.predict(np.array(x_train))
-    # model11_pred = model11.predict(np.array(x_train))
-    # model12_pred = model12.predict(np.array(x_train))
-    # model13_pred = model13.predict(np.array(x_train))
+    model7_pred = model7.predict(np.array(x_train))
+    model8_pred = model8.predict(np.array(x_train))
+    model9_pred = model9.predict(np.array(x_train))
+    model10_pred = model10.predict(np.array(x_train))
+    model11_pred = model11.predict(np.array(x_train))
+    model12_pred = model12.predict(np.array(x_train))
+    model13_pred = model13.predict(np.array(x_train))
 
     model_xgb_2 = xgb.Booster()
-    model_xgb_2.load_model("xgb_12model2.txt")
+    model_xgb_2.load_model("xgb_12model4.txt")
     test = xgb.DMatrix(inputs)
     xgb_pred = model_xgb_2.predict(test)
 
 
-    ada_model = pickle.load(open("ada_12model10.sav", 'rb'))
+    ada_model = pickle.load(open("ada_12model14.sav", 'rb'))
     ada_pred = ada_model.predict_proba(inputs)
 
     _, test2y = scale_data(file_name)
@@ -362,11 +366,11 @@ if __name__ == "__main__":
     data.set_index('date')
     data.index = data['date']
 
-    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model6_pred, 0.76, 0.68)  # xgb
-    _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.49, 0.49) # xgb
-    _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.49, 0.61)  # ada
+    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model6_pred, 0.73, 0.81)  # xgb
+    _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.50, 0.47) # xgb
+    _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.60, 0.73)  # ada
 
-    data.index = pd.to_datetime(data.index).strftime("%d-%m")
+    # data.index = pd.to_datetime(data.index).strftime("%d-%m")
 
     data.plot(y=["Kapitał XGBoost", "Kapitał sieci neuronowej", "Kapitał ADABoost"], rot=45, grid=True,
               ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
@@ -381,6 +385,8 @@ if __name__ == "__main__":
     # acc_conv, buy_conv, sell_conv = find_best_prob(model3_pred)
     # acc_xgb, buy_xgb, sell_xgb = find_best_prob(xgb_pred)
     # acc_ada, buy_ada, sell_ada = find_best_prob(ada_pred)
+    # print(buy_xgb, sell_xgb)
+    # print(buy_ada, sell_ada)
 
     # acc_conv1, buy_conv1, sell_conv1 = find_best_prob(model1_pred)
     # acc_conv2, buy_conv2, sell_conv2 = find_best_prob(model2_pred)
@@ -395,7 +401,7 @@ if __name__ == "__main__":
     # acc_conv11, buy_conv11, sell_conv11 = find_best_prob(model11_pred)
     # acc_conv12, buy_conv12, sell_conv12 = find_best_prob(model12_pred)
     # acc_conv13, buy_conv13, sell_conv13 = find_best_prob(model13_pred)
-
+    #
     # print("for model1 buy:",buy_conv1,"sell:",sell_conv1)
     # print("for model2 buy:", buy_conv2, "sell:", sell_conv2)
     # print("for model3 buy:", buy_conv3, "sell:", sell_conv3)
@@ -417,27 +423,80 @@ if __name__ == "__main__":
     # print("xgb:",buy_xgb,sell_xgb)
     # print("ada:",buy_ada,sell_ada)
 
-    # _, data["Conv model 1 earnings"] = calculate_earnings(df, test2y, model1_pred, 0.73, 0.97)  # xgb
-    # _, data["Conv model 2 earnings"] = calculate_earnings(df, test2y, model2_pred, 0.76, 0.52)  # xgb
-    # _, data["Conv model 3 earnings"] = calculate_earnings(df, test2y, model3_pred, 0.77, 0.75)  # xgb
-    # _, data["Conv model 4 earnings"] = calculate_earnings(df, test2y, model4_pred, 0.69, 0.48)  # xgb
-    # _, data["Conv model 5 earnings"] = calculate_earnings(df, test2y, model5_pred, 0.61, 0.93)  # xgb
-    # _, data["Conv model 6 earnings"] = calculate_earnings(df, test2y, model6_pred, 0.76, 0.68)  # xgb
-    # _, data["Conv model 7 earnings"] = calculate_earnings(df, test2y, model7_pred, 0.80, 0.83)  # xgb
-    # _, data["Conv model 8 earnings"] = calculate_earnings(df, test2y, model8_pred, 0.62, 0.58)  # xgb
-    # _, data["Conv model 9 earnings"] = calculate_earnings(df, test2y, model9_pred, 0.85, 0.93)  # xgb
-    # _, data["Conv model 10 earnings"] = calculate_earnings(df, test2y, model10_pred, 0.74, 0.98)  # xgb
-    # _, data["Conv model 11 earnings"] = calculate_earnings(df, test2y, model11_pred, 0.55, 0.69)  # xgb
-    # _, data["Conv model 12 earnings"] = calculate_earnings(df, test2y, model12_pred, 0.92, 0.93)  # xgb
-    # _, data["Conv model 13 earnings"] = calculate_earnings(df, test2y, model13_pred, 0.30, 0.51)  # xgb
+    _, data["Kapitał modelu 1"] = calculate_earnings(df, test2y, model1_pred, 0.48, 0.97)  # xgb
+    _, data["Kapitał modelu 2"] = calculate_earnings(df, test2y, model2_pred, 0.54, 0.70)  # xgb
+    _, data["Kapitał modelu 3"] = calculate_earnings(df, test2y, model3_pred, 0.46, 0.55)  # xgb
+    _, data["Kapitał modelu 4"] = calculate_earnings(df, test2y, model4_pred, 0.73, 0.54)  # xgb
+    _, data["Kapitał modelu 5"] = calculate_earnings(df, test2y, model5_pred, 0.61, 0.90)  # xgb
+    _, data["Kapitał modelu 6"] = calculate_earnings(df, test2y, model6_pred, 0.81, 0.73)  # xgb
+    _, data["Kapitał modelu 7"] = calculate_earnings(df, test2y, model7_pred, 0.75, 0.92)  # xgb
+    _, data["Kapitał modelu 8"] = calculate_earnings(df, test2y, model8_pred, 0.66, 0.97)  # xgb
+    _, data["Kapitał modelu 9"] = calculate_earnings(df, test2y, model9_pred, 0.58, 0.79)  # xgb
+    _, data["Kapitał modelu 10"] = calculate_earnings(df, test2y, model10_pred, 0.83, 0.56)  # xgb
+    _, data["Kapitał modelu 11"] = calculate_earnings(df, test2y, model11_pred, 0.70, 0.76)  # xgb
+    _, data["Kapitał modelu 12"] = calculate_earnings(df, test2y, model12_pred, 0.68, 0.53)  # xgb
+    _, data["Kapitał modelu 13"] = calculate_earnings(df, test2y, model13_pred, 0.52, 0.73)  # xgb
+    print(data)
+    # model1_pred = filter(model1_pred, 0.97, 0.48)
+    # model2_pred = filter(model2_pred, 0.70, 0.54)
+    # model3_pred = filter(model3_pred, 0.55, 0.46)
+    # model4_pred = filter(model4_pred, 0.54, 0.73)
+    # model5_pred = filter(model5_pred, 0.90, 0.61)
+    # model6_pred = filter(model6_pred, 0.73, 0.81)
+    # model7_pred = filter(model7_pred, 0.92, 0.75)
+    # model8_pred = filter(model8_pred, 0.97, 0.66)
+    # model9_pred = filter(model9_pred, 0.79, 0.58)
+    # model10_pred = filter(model10_pred, 0.56, 0.83)
+    # model11_pred = filter(model11_pred, 0.76, 0.70)
+    # model12_pred = filter(model12_pred, 0.53, 0.68)
+    # model13_pred = filter(model13_pred, 0.73, 0.52)
+    # xgb_pred = filter(xgb_pred, 0.50, 0.47)
+    # ada_pred = filter(ada_pred, 0.60, 0.73)
+    #
+    # acc1 = accuracy_score(test2y, model1_pred)
+    # acc2 = accuracy_score(test2y, model2_pred)
+    # acc3 = accuracy_score(test2y, model3_pred)
+    # acc4 = accuracy_score(test2y, model4_pred)
+    # acc5 = accuracy_score(test2y, model5_pred)
+    # acc6 = accuracy_score(test2y, model6_pred)
+    # acc7 = accuracy_score(test2y, model7_pred)
+    # acc8 = accuracy_score(test2y, model8_pred)
+    # acc9 = accuracy_score(test2y, model9_pred)
+    # acc10 = accuracy_score(test2y, model10_pred)
+    # acc11 = accuracy_score(test2y, model11_pred)
+    # acc12 = accuracy_score(test2y, model12_pred)
+    # acc13 = accuracy_score(test2y, model13_pred)
+    # acc14 = accuracy_score(test2y, xgb_pred)
+    # acc15 = accuracy_score(test2y, ada_pred)
+    # print(acc1)
+    # print(acc2)
+    # print(acc3)
+    # print(acc4)
+    # print(acc5)
+    # print(acc6)
+    # print(acc7)
+    # print(acc8)
+    # print(acc9)
+    # print(acc10)
+    # print(acc11)
+    # print(acc12)
+    # print(acc13)
+    # print(acc14)
+    # print(acc15)
+    data.index = pd.to_datetime(data.index, dayfirst=True).strftime("%d-%m")
+    my_colors = ["hotpink", "crimson","magenta","darkmagenta","indigo","blue","slategray",
+                 "steelblue","cyan","mediumspringgreen","yellow","orange","peru","black","tomato"]
+    # #
+    data.plot(y=["Kapitał modelu 1", "Kapitał modelu 2", "Kapitał modelu 3", "Kapitał modelu 4",
+                 "Kapitał modelu 5", "Kapitał modelu 6", "Kapitał modelu 7", "Kapitał modelu 8",
+                 "Kapitał modelu 9", "Kapitał modelu 10", "Kapitał modelu 11", "Kapitał modelu 12",
+                 "Kapitał modelu 13", "Kapitał XGBoost", "Kapitał ADABoost"], rot=45, grid=True,
+              ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
+                                                                      " czasu w dniach od 08-07-2022 do 18-09-2022",
+              color = my_colors)
+    plt.show()  # Depending on whether you use IPython or interactive mode, etc.
 
-    # data.plot(y=["Conv model 1 earnings", "Conv model 2 earnings", "Conv model 3 earnings", "Conv model 4 earnings",
-    #              "Conv model 5 earnings", "Conv model 6 earnings", "Conv model 7 earnings", "Conv model 8 earnings",
-    #              "Conv model 9 earnings", "Conv model 10 earnings", "Conv model 11 earnings", "Conv model 12 earnings",
-    #              "Conv model 13 earnings"], rot=45)
-    # plt.show()  # Depending on whether you use IPython or interactive mode, etc.
-
-    # plot_decisions(plot_conv, 0.54, 0.84)
+    # plot_decisions(df, test2y, model4_pred, 0.73, 0.54)
     # plot_decisions(plot_xgb, 0.41, 0.37)
     # ada_pred = filter(ada_pred)
     # plot_decisions('./data/BTC_tests3.csv', ada_pred)

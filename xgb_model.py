@@ -39,6 +39,7 @@ def concat_predictions():
     df1 = pd.read_csv(f'./XBoost_data/{filename[0]}')
 
     for i in range(1, len(filename)):
+        print(filename[i])
         print(f'Files done: {i}/{len(filename)}')
         df2 = pd.read_csv(f'./XBoost_data/{filename[i]}')
         df1 = pd.concat([df1, df2], axis=1)
@@ -79,10 +80,11 @@ if __name__ == "__main__":
     #####################
     # XGBOOST
     # ####################
-    clf = xgb.XGBClassifier(max_depth=7, min_child_weight=7, learning_rate = 0.1, gamma=0.2, n_estimators=60,
-                            subsample=0.86, colsample_bytree=0.78, nthread=4, scale_pos_weight=1, seed=60)
+    clf = xgb.XGBClassifier(max_depth=7, min_child_weight=8, learning_rate = 0.1, gamma=0.67, n_estimators=60,
+                            subsample=0.74, colsample_bytree=0.7, nthread=4, scale_pos_weight=1, seed=60)
     parameters = {
-        'n_estimators': [50,60,70,80,90,100,120,140,160,180,200,250]
+        'max_depth': [5,6,7,8,9,10,11,12,13,14],
+        'min_child_weight':[5,6,7,8,9,10,11,12,13,14]
 
     }
     # grid = GridSearchCV(estimator=clf, param_grid=parameters, cv=10, scoring='f1_macro', n_jobs=-1, verbose=10)
@@ -94,13 +96,13 @@ if __name__ == "__main__":
     # accuracy = accuracy_score(y_test, y_pred)
     # print(accuracy * 100.0)
     # print("Accuracy: %.2f%%" % (accuracy * 100.0))
-    clf.save_model("xgb_12model2.txt")
+    clf.save_model("xgb_12model4.txt")
 
     #####################
     # ADABOOST
     # ####################
 
-    dt = DecisionTreeClassifier(max_depth = 12, max_features=9,min_samples_split=0.01,
+    dt = DecisionTreeClassifier(max_depth = 13, max_features=11,min_samples_split=0.01,
                                 random_state=1)
     params_dt = {
         'max_depth': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
@@ -123,9 +125,9 @@ if __name__ == "__main__":
         elif max_index == 2:
             y_train_vector.append(2)
     #
-    ada = AdaBoostClassifier(base_estimator=dt, n_estimators=160, random_state=1)
+    ada = AdaBoostClassifier(base_estimator=dt, n_estimators=190, random_state=1)
     #
-    # grid_ada = GridSearchCV(estimator=ada, param_grid={'n_estimators':[10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,230,260,290,300,320,340,360]}, scoring='f1_macro', cv=10, n_jobs=-1, verbose=10)
+    # grid_ada = GridSearchCV(estimator=ada, param_grid={'n_estimators':[190,200,210,220,230,240]}, scoring='f1_macro', cv=10, n_jobs=-1, verbose=10)
     # grid_ada.fit(X_train, y_train_vector)
     # print(grid_ada.best_estimator_)
     # #
@@ -133,6 +135,6 @@ if __name__ == "__main__":
     # ada.fit(X_train, y_train_vector)
     # calibrated_clf = CalibratedClassifierCV(base_estimator=ada, method='sigmoid', cv='prefit')
     # calibrated_clf.fit(X_calib, y_calib)
-    # pickle.dump(ada, open("ada_12model10.sav", 'wb'))
+    # pickle.dump(ada, open("ada_12model14.sav", 'wb'))
     # pred =ada.predict_proba(X_calib)
     # print(pred)
