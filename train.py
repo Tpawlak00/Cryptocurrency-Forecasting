@@ -10,21 +10,24 @@ file_name = "./data/BTC_2020.csv"
 def build_model():
     model_name = tf.keras.models.Sequential()
 
-    model_name.add(tf.keras.layers.Conv1D(256, 3, input_shape=(pred_length, 1)))
-    model_name.add(tf.keras.layers.Dropout(0.2))
+    model_name.add(tf.keras.layers.Conv1D(256, 3, input_shape=(pred_length, 1), activation='relu'))
+    model_name.add(tf.keras.layers.Dropout(0.3))
+    # model_name.add(tf.keras.layers.Conv1D(128, 2, activation='relu'))
+    # model_name.add(tf.keras.layers.Dropout(0.3))
     model_name.add(tf.keras.layers.Dense(128, activation='relu'))
+    model_name.add(tf.keras.layers.Dropout(0.3))
+    # model_name.add(tf.keras.layers.Dropout(0.2))
+    # model_name.add(tf.keras.layers.LSTM(128, return_sequences=True))
+    # model_name.add(tf.keras.layers.Dropout(0.2))
+    model_name.add(tf.keras.layers.LSTM(256, return_sequences=True))
+    model_name.add(tf.keras.layers.Dropout(0.3))
     model_name.add(tf.keras.layers.LSTM(128))
-    model_name.add(tf.keras.layers.Dropout(0.4))
+    # model_name.add(tf.keras.layers.Dropout(0.2))
     # model_name.add(tf.keras.layers.Flatten())
 
     model_name.add(tf.keras.layers.Dense(128, activation='relu'))
-    # model_name.add(tf.keras.layers.Dropout(0.6))
-    # model_name.add(tf.keras.layers.Dense(16, activation='relu'))
-    # model_name.add(tf.keras.layers.BatchNormalization())
-    # model_name.add(tf.keras.layers.Dense(64, activation='relu'))
-    # model_name.add(tf.keras.layers.Dense(32, activation='relu'))
-    # model_name.add(tf.keras.layers.BatchNormalization())
-    # model.add(tf.keras.layers.Dropout(0.5))
+
+    # model_name.add(tf.keras.layers.Dropout(0.2))
 
     model_name.add(tf.keras.layers.Dense(3, activation='softmax'))
 
@@ -48,10 +51,10 @@ def model_checkpoint(model_path):
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=f'{model_path}/Conv.h5',
         save_weights_only=False,
-        monitor='accuracy',
+        monitor='val_accuracy',
         mode='max',
         save_best_only=True,
-        verbose=0)
+        verbose=1)
     return model_checkpoint_callback
 
 
@@ -62,11 +65,12 @@ if __name__ == "__main__":
     os.mkdir(path)
 
     inputs, outputs = scale_data(file_name)
+    print(inputs)
+    print(outputs)
+
     model = build_model()
     # model = tf.keras.models.load_model(f'{path}/Conv.h5')
-    print(len(inputs))
-    print(len(outputs))
-    history = model.fit(inputs, outputs, epochs=1000, batch_size=512,
+    history = model.fit(inputs, outputs, epochs=350, batch_size=512,
                         validation_split=0.2,
                         verbose=1,
                         callbacks=[model_checkpoint(path)])

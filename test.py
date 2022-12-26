@@ -45,37 +45,9 @@ def concat_predictions():
 
 def calculate_earnings(dataframe, outputs, predictions, buy_prob, sell_prob):
     df_check = pd.DataFrame()
-    df_check['value'], df_check['date'] = dataframe['value'][2027:], dataframe['date'][2027:]
+    df_check['value'], df_check['date'] = dataframe['value'][2015:], dataframe['date'][2015:]
     df_check.index = df_check['date']
     df_check = df_check.drop(['date'], axis=1)
-
-    action_list = []
-    for i in range(len(outputs)):
-        # get index of max value
-        max_val = np.max(outputs[i])
-        # Find index position of maximum value using where()
-        max_index = np.where(outputs[i] == max_val)[0]
-        if max_index == 0:
-            action_list.append("S")
-        elif max_index == 1:
-            action_list.append("H")
-        elif max_index == 2:
-            action_list.append("B")
-    df_check["action"] = action_list
-
-    capital = 1
-    value = 0
-    earnings_list = [1]
-    for i in range(1, len(df_check)):
-        if df_check["action"][i] == "B":
-            value = capital / df_check["value"][i]
-        elif df_check["action"][i] == "H":
-            value = value
-            capital = capital
-        elif df_check["action"][i] == "S":
-            capital = value * df_check["value"][i]
-        earnings_list.append(capital)
-    df_check["estimated earnings"] = earnings_list
 
     bot_actions = []
     # calculate bot earnings
@@ -132,9 +104,8 @@ def calculate_earnings(dataframe, outputs, predictions, buy_prob, sell_prob):
             continue
 
     df_check["bot earnings"] = bot_earnings
-    print(df_check["bot earnings"][-1])
 
-    accuracy = df_check["bot earnings"][-1] / df_check["estimated earnings"][-1]
+    accuracy = df_check["bot earnings"][-1]
     # d1 = datetime.strptime(df_check.index[0], '%Y-%m-%d %H:%M:%S')
     # d2 = datetime.strptime(df_check.index[-1], '%Y-%m-%d %H:%M:%S')
     # d1 = datetime.strptime(df_check.index[0], '%d.%m.%Y %H:%M')
@@ -207,7 +178,7 @@ def plot_decisions(path, pred_list):
     data = data.set_index('date')
     # data['date'] = pd.to_datetime(data['date'].dt.strftime('%m/%d/%Y'))
     plot_data = data['value']
-    plot_data = plot_data[2592:2880]
+    plot_data = plot_data[3000:3288]
     print(pd.DataFrame(plot_data))
     sell_list = []
     buy_list = []
@@ -258,8 +229,8 @@ def plot(path, pred_list):
     # data['date'] = pd.to_datetime(data['date'].dt.strftime('%m/%d/%Y'))
     plot_data = data['value']
     plot_data = plot_data[2015:]
-    plot_data = plot_data[1:289]
-    pred_list = pred_list[1:289]
+    plot_data = plot_data[1:2000]
+    pred_list = pred_list[1:2000]
     sell_list = []
     buy_list = []
     for i in range(12, len(plot_data)):
@@ -329,7 +300,7 @@ if __name__ == "__main__":
     model11 = tf.keras.models.load_model(f'./saved_model/From 10-28-2021 00-00 To 11-27-2021 00-00/Conv.h5')
     model12 = tf.keras.models.load_model(f'./saved_model/From 11-27-2021 00-00 To 12-27-2021 00-00/Conv.h5')
     model13 = tf.keras.models.load_model(f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55/Conv.h5')
-
+    #
     model1_pred = model1.predict(np.array(x_train))
     model2_pred = model2.predict(np.array(x_train))
     model3_pred = model3.predict(np.array(x_train))
@@ -362,17 +333,17 @@ if __name__ == "__main__":
     df = df[::-1]
 
     data = pd.DataFrame()
-    data['Value'], data['date'], data['target'] = df['value'][2027:], df['date'][2027:], df['target'][2027:]
+    data['Value'], data['date'], data['target'] = df['value'][2016:], df['date'][2016:], df['target'][2016:]
     data.set_index('date')
     data.index = data['date']
 
-    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model6_pred, 0.73, 0.81)  # xgb
-    _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.50, 0.47) # xgb
-    _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.60, 0.73)  # ada
+    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model1_pred, 0.54, 0.56)  # xgb
+    # _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.50, 0.47) # xgb
+    # _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.60, 0.73)  # ada
 
     # data.index = pd.to_datetime(data.index).strftime("%d-%m")
 
-    data.plot(y=["Kapitał XGBoost", "Kapitał sieci neuronowej", "Kapitał ADABoost"], rot=45, grid=True,
+    data.plot(y=["Kapitał sieci neuronowej"], rot=45, grid=True,
               ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
                                                                       " czasu w dniach od 26-09-2022 do 07-11-2022",
               legend=True, x_compat=True)
@@ -401,7 +372,7 @@ if __name__ == "__main__":
     # acc_conv11, buy_conv11, sell_conv11 = find_best_prob(model11_pred)
     # acc_conv12, buy_conv12, sell_conv12 = find_best_prob(model12_pred)
     # acc_conv13, buy_conv13, sell_conv13 = find_best_prob(model13_pred)
-    #
+    # #
     # print("for model1 buy:",buy_conv1,"sell:",sell_conv1)
     # print("for model2 buy:", buy_conv2, "sell:", sell_conv2)
     # print("for model3 buy:", buy_conv3, "sell:", sell_conv3)
@@ -423,20 +394,20 @@ if __name__ == "__main__":
     # print("xgb:",buy_xgb,sell_xgb)
     # print("ada:",buy_ada,sell_ada)
 
-    _, data["Kapitał modelu 1"] = calculate_earnings(df, test2y, model1_pred, 0.48, 0.97)  # xgb
-    _, data["Kapitał modelu 2"] = calculate_earnings(df, test2y, model2_pred, 0.54, 0.70)  # xgb
-    _, data["Kapitał modelu 3"] = calculate_earnings(df, test2y, model3_pred, 0.46, 0.55)  # xgb
-    _, data["Kapitał modelu 4"] = calculate_earnings(df, test2y, model4_pred, 0.73, 0.54)  # xgb
-    _, data["Kapitał modelu 5"] = calculate_earnings(df, test2y, model5_pred, 0.61, 0.90)  # xgb
-    _, data["Kapitał modelu 6"] = calculate_earnings(df, test2y, model6_pred, 0.81, 0.73)  # xgb
-    _, data["Kapitał modelu 7"] = calculate_earnings(df, test2y, model7_pred, 0.75, 0.92)  # xgb
-    _, data["Kapitał modelu 8"] = calculate_earnings(df, test2y, model8_pred, 0.66, 0.97)  # xgb
-    _, data["Kapitał modelu 9"] = calculate_earnings(df, test2y, model9_pred, 0.58, 0.79)  # xgb
-    _, data["Kapitał modelu 10"] = calculate_earnings(df, test2y, model10_pred, 0.83, 0.56)  # xgb
-    _, data["Kapitał modelu 11"] = calculate_earnings(df, test2y, model11_pred, 0.70, 0.76)  # xgb
-    _, data["Kapitał modelu 12"] = calculate_earnings(df, test2y, model12_pred, 0.68, 0.53)  # xgb
-    _, data["Kapitał modelu 13"] = calculate_earnings(df, test2y, model13_pred, 0.52, 0.73)  # xgb
-    print(data)
+    _, data["Kapitał modelu 1"] = calculate_earnings(df, test2y, model1_pred, 0.54, 0.56)  # xgb
+    _, data["Kapitał modelu 2"] = calculate_earnings(df, test2y, model2_pred, 0.99, 0.93)  # xgb
+    _, data["Kapitał modelu 3"] = calculate_earnings(df, test2y, model3_pred, 0.52, 0.53)  # xgb
+    _, data["Kapitał modelu 4"] = calculate_earnings(df, test2y, model4_pred, 0.51, 0.48)  # xgb
+    _, data["Kapitał modelu 5"] = calculate_earnings(df, test2y, model5_pred, 0.54, 0.40)  # xgb
+    _, data["Kapitał modelu 6"] = calculate_earnings(df, test2y, model6_pred, 0.50, 0.43)  # xgb
+    _, data["Kapitał modelu 7"] = calculate_earnings(df, test2y, model7_pred, 0.59, 0.55)  # xgb
+    _, data["Kapitał modelu 8"] = calculate_earnings(df, test2y, model8_pred, 0.54, 0.47)  # xgb
+    _, data["Kapitał modelu 9"] = calculate_earnings(df, test2y, model9_pred, 0.59, 0.55)  # xgb
+    _, data["Kapitał modelu 10"] = calculate_earnings(df, test2y, model10_pred, 0.88, 0.56)  # xgb
+    _, data["Kapitał modelu 11"] = calculate_earnings(df, test2y, model11_pred, 0.47, 0.44)  # xgb
+    _, data["Kapitał modelu 12"] = calculate_earnings(df, test2y, model12_pred, 0.53, 0.53)  # xgb
+    _, data["Kapitał modelu 13"] = calculate_earnings(df, test2y, model13_pred, 0.55, 0.51)  # xgb
+    # print(data)
     # model1_pred = filter(model1_pred, 0.97, 0.48)
     # model2_pred = filter(model2_pred, 0.70, 0.54)
     # model3_pred = filter(model3_pred, 0.55, 0.46)
@@ -490,7 +461,7 @@ if __name__ == "__main__":
     data.plot(y=["Kapitał modelu 1", "Kapitał modelu 2", "Kapitał modelu 3", "Kapitał modelu 4",
                  "Kapitał modelu 5", "Kapitał modelu 6", "Kapitał modelu 7", "Kapitał modelu 8",
                  "Kapitał modelu 9", "Kapitał modelu 10", "Kapitał modelu 11", "Kapitał modelu 12",
-                 "Kapitał modelu 13", "Kapitał XGBoost", "Kapitał ADABoost"], rot=45, grid=True,
+                 "Kapitał modelu 13"], rot=45, grid=True,
               ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
                                                                       " czasu w dniach od 08-07-2022 do 18-09-2022",
               color = my_colors)
@@ -498,7 +469,9 @@ if __name__ == "__main__":
 
     # plot_decisions(df, test2y, model4_pred, 0.73, 0.54)
     # plot_decisions(plot_xgb, 0.41, 0.37)
-    # ada_pred = filter(ada_pred)
-    # plot_decisions('./data/BTC_tests3.csv', ada_pred)
+    model10_pred = filter(model10_pred, 0.88, 0.56)
+    model11_pred = filter(model11_pred, 0.47, 0.44)
+    plot_decisions('./data/BTC_tests3.csv', model10_pred)
+    plot_decisions('./data/BTC_tests3.csv', model11_pred)
 
     # plot(file_name, test2y)

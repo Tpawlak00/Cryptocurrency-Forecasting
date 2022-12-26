@@ -19,10 +19,10 @@ def model_checkpoint(model_path):
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=f'{model_path}/Conv.h5',
         save_weights_only=False,
-        monitor='accuracy',
+        monitor='val_accuracy',
         mode='max',
         save_best_only=True,
-        verbose=0)
+        verbose=1)
     return model_checkpoint_callback
 
 

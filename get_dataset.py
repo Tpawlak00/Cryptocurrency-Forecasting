@@ -49,12 +49,11 @@ def split_data(filepath):
 def scale_data(filepath):
     x_train, y_train = split_data(filepath)
     x_train_scaled = []
-
-    for i in range(len(x_train)-2015):
-        scaled_df = scaler.fit_transform(x_train[0 + i:2016 + i])
-        x_train_scaled.append(scaled_df[-1])
-
-    y_train = y_train[2015:]
+    y_train = y_train[2003:]
     y_train = tf.keras.utils.to_categorical(y_train)
 
-    return np.array(x_train_scaled[1:]), np.array(y_train)
+    for i in range(len(x_train)-2004):
+        scaled_df = scaler.fit_transform(x_train[0 + i:2005 + i])
+        x_train_scaled.append(scaled_df[-1])
+
+    return np.array(x_train_scaled), np.array(y_train)
