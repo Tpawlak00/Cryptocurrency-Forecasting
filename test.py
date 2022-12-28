@@ -278,8 +278,8 @@ def plot(path, pred_list):
     plt.show()
 
 if __name__ == "__main__":
-    # create_files()
-    # concat_predictions()
+    create_files()
+    concat_predictions()
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     df = pd.read_csv('./XBoost_data_test/Superset_test.csv', sep=',', header=None, low_memory=False)
 
@@ -287,41 +287,41 @@ if __name__ == "__main__":
     inputs = df.to_numpy()
 
     x_train, _ = scale_data(file_name)
-    model1 = tf.keras.models.load_model(f'./saved_model/From 01-01-2021 00-00 To 01-31-2021 00-00/Conv.h5')
-    model2 = tf.keras.models.load_model(f'./saved_model/From 01-31-2021 00-00 To 03-02-2021 00-00/Conv.h5')
-    model3 = tf.keras.models.load_model("./saved_model/From 03-02-2021 00-00 To 04-01-2021 00-00/Conv.h5")
-    model4 = tf.keras.models.load_model(f'./saved_model/From 04-01-2021 00-00 To 05-01-2021 00-00/Conv.h5')
-    model5 = tf.keras.models.load_model(f'./saved_model/From 05-01-2021 00-00 To 05-31-2021 00-00/Conv.h5')
-    model6 = tf.keras.models.load_model(f'./saved_model/From 05-31-2021 00-00 To 06-30-2021 00-00/Conv.h5')
-    model7 = tf.keras.models.load_model(f'./saved_model/From 06-30-2021 00-00 To 07-30-2021 00-00/Conv.h5')
-    model8 = tf.keras.models.load_model(f'./saved_model/From 07-30-2021 00-00 To 08-29-2021 00-00/Conv.h5')
-    model9 = tf.keras.models.load_model(f'./saved_model/From 08-29-2021 00-00 To 09-28-2021 00-00/Conv.h5')
-    model10 = tf.keras.models.load_model(f'./saved_model/From 09-28-2021 00-00 To 10-28-2021 00-00/Conv.h5')
+    # model1 = tf.keras.models.load_model(f'./saved_model/From 01-01-2021 00-00 To 01-31-2021 00-00/Conv.h5')
+    # model2 = tf.keras.models.load_model(f'./saved_model/From 01-31-2021 00-00 To 03-02-2021 00-00/Conv.h5')
+    # model3 = tf.keras.models.load_model("./saved_model/From 03-02-2021 00-00 To 04-01-2021 00-00/Conv.h5")
+    # model4 = tf.keras.models.load_model(f'./saved_model/From 04-01-2021 00-00 To 05-01-2021 00-00/Conv.h5')
+    # model5 = tf.keras.models.load_model(f'./saved_model/From 05-01-2021 00-00 To 05-31-2021 00-00/Conv.h5')
+    # model6 = tf.keras.models.load_model(f'./saved_model/From 05-31-2021 00-00 To 06-30-2021 00-00/Conv.h5')
+    # model7 = tf.keras.models.load_model(f'./saved_model/From 06-30-2021 00-00 To 07-30-2021 00-00/Conv.h5')
+    # model8 = tf.keras.models.load_model(f'./saved_model/From 07-30-2021 00-00 To 08-29-2021 00-00/Conv.h5')
+    # model9 = tf.keras.models.load_model(f'./saved_model/From 08-29-2021 00-00 To 09-28-2021 00-00/Conv.h5')
+    # model10 = tf.keras.models.load_model(f'./saved_model/From 09-28-2021 00-00 To 10-28-2021 00-00/Conv.h5')
     model11 = tf.keras.models.load_model(f'./saved_model/From 10-28-2021 00-00 To 11-27-2021 00-00/Conv.h5')
-    model12 = tf.keras.models.load_model(f'./saved_model/From 11-27-2021 00-00 To 12-27-2021 00-00/Conv.h5')
-    model13 = tf.keras.models.load_model(f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55/Conv.h5')
-    #
-    model1_pred = model1.predict(np.array(x_train))
-    model2_pred = model2.predict(np.array(x_train))
-    model3_pred = model3.predict(np.array(x_train))
-    model4_pred = model4.predict(np.array(x_train))
-    model5_pred = model5.predict(np.array(x_train))
-    model6_pred = model6.predict(np.array(x_train))
-    model7_pred = model7.predict(np.array(x_train))
-    model8_pred = model8.predict(np.array(x_train))
-    model9_pred = model9.predict(np.array(x_train))
-    model10_pred = model10.predict(np.array(x_train))
+    # model12 = tf.keras.models.load_model(f'./saved_model/From 11-27-2021 00-00 To 12-27-2021 00-00/Conv.h5')
+    # model13 = tf.keras.models.load_model(f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55/Conv.h5')
+    # #
+    # model1_pred = model1.predict(np.array(x_train))
+    # model2_pred = model2.predict(np.array(x_train))
+    # model3_pred = model3.predict(np.array(x_train))
+    # model4_pred = model4.predict(np.array(x_train))
+    # model5_pred = model5.predict(np.array(x_train))
+    # model6_pred = model6.predict(np.array(x_train))
+    # model7_pred = model7.predict(np.array(x_train))
+    # model8_pred = model8.predict(np.array(x_train))
+    # model9_pred = model9.predict(np.array(x_train))
+    # model10_pred = model10.predict(np.array(x_train))
     model11_pred = model11.predict(np.array(x_train))
-    model12_pred = model12.predict(np.array(x_train))
-    model13_pred = model13.predict(np.array(x_train))
+    # model12_pred = model12.predict(np.array(x_train))
+    # model13_pred = model13.predict(np.array(x_train))
 
     model_xgb_2 = xgb.Booster()
-    model_xgb_2.load_model("xgb_12model4.txt")
+    model_xgb_2.load_model("xgb_12model5.txt")
     test = xgb.DMatrix(inputs)
     xgb_pred = model_xgb_2.predict(test)
 
 
-    ada_model = pickle.load(open("ada_12model14.sav", 'rb'))
+    ada_model = pickle.load(open("ada_12model15.sav", 'rb'))
     ada_pred = ada_model.predict_proba(inputs)
 
     _, test2y = scale_data(file_name)
@@ -337,13 +337,13 @@ if __name__ == "__main__":
     data.set_index('date')
     data.index = data['date']
 
-    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model1_pred, 0.54, 0.56)  # xgb
-    # _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.50, 0.47) # xgb
-    # _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.60, 0.73)  # ada
+    _, data["Kapitał sieci neuronowej"] = calculate_earnings(df, test2y, model11_pred,  0.47, 0.44)  # xgb
+    _, data["Kapitał XGBoost"] = calculate_earnings(df, test2y, xgb_pred, 0.47, 0.49) # xgb
+    _, data["Kapitał ADABoost"] = calculate_earnings(df, test2y, ada_pred, 0.66, 0.76)  # ada
 
-    # data.index = pd.to_datetime(data.index).strftime("%d-%m")
+    data.index = pd.to_datetime(data.index).strftime("%d-%m")
 
-    data.plot(y=["Kapitał sieci neuronowej"], rot=45, grid=True,
+    data.plot(y=["Kapitał sieci neuronowej", "Kapitał XGBoost", "Kapitał ADABoost"], rot=45, grid=True,
               ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
                                                                       " czasu w dniach od 26-09-2022 do 07-11-2022",
               legend=True, x_compat=True)
@@ -394,19 +394,19 @@ if __name__ == "__main__":
     # print("xgb:",buy_xgb,sell_xgb)
     # print("ada:",buy_ada,sell_ada)
 
-    _, data["Kapitał modelu 1"] = calculate_earnings(df, test2y, model1_pred, 0.54, 0.56)  # xgb
-    _, data["Kapitał modelu 2"] = calculate_earnings(df, test2y, model2_pred, 0.99, 0.93)  # xgb
-    _, data["Kapitał modelu 3"] = calculate_earnings(df, test2y, model3_pred, 0.52, 0.53)  # xgb
-    _, data["Kapitał modelu 4"] = calculate_earnings(df, test2y, model4_pred, 0.51, 0.48)  # xgb
-    _, data["Kapitał modelu 5"] = calculate_earnings(df, test2y, model5_pred, 0.54, 0.40)  # xgb
-    _, data["Kapitał modelu 6"] = calculate_earnings(df, test2y, model6_pred, 0.50, 0.43)  # xgb
-    _, data["Kapitał modelu 7"] = calculate_earnings(df, test2y, model7_pred, 0.59, 0.55)  # xgb
-    _, data["Kapitał modelu 8"] = calculate_earnings(df, test2y, model8_pred, 0.54, 0.47)  # xgb
-    _, data["Kapitał modelu 9"] = calculate_earnings(df, test2y, model9_pred, 0.59, 0.55)  # xgb
-    _, data["Kapitał modelu 10"] = calculate_earnings(df, test2y, model10_pred, 0.88, 0.56)  # xgb
-    _, data["Kapitał modelu 11"] = calculate_earnings(df, test2y, model11_pred, 0.47, 0.44)  # xgb
-    _, data["Kapitał modelu 12"] = calculate_earnings(df, test2y, model12_pred, 0.53, 0.53)  # xgb
-    _, data["Kapitał modelu 13"] = calculate_earnings(df, test2y, model13_pred, 0.55, 0.51)  # xgb
+    # _, data["Kapitał modelu 1"] = calculate_earnings(df, test2y, model1_pred, 0.54, 0.56)  # xgb
+    # _, data["Kapitał modelu 2"] = calculate_earnings(df, test2y, model2_pred, 0.99, 0.93)  # xgb
+    # _, data["Kapitał modelu 3"] = calculate_earnings(df, test2y, model3_pred, 0.52, 0.53)  # xgb
+    # _, data["Kapitał modelu 4"] = calculate_earnings(df, test2y, model4_pred, 0.51, 0.48)  # xgb
+    # _, data["Kapitał modelu 5"] = calculate_earnings(df, test2y, model5_pred, 0.54, 0.40)  # xgb
+    # _, data["Kapitał modelu 6"] = calculate_earnings(df, test2y, model6_pred, 0.50, 0.43)  # xgb
+    # _, data["Kapitał modelu 7"] = calculate_earnings(df, test2y, model7_pred, 0.59, 0.55)  # xgb
+    # _, data["Kapitał modelu 8"] = calculate_earnings(df, test2y, model8_pred, 0.54, 0.47)  # xgb
+    # _, data["Kapitał modelu 9"] = calculate_earnings(df, test2y, model9_pred, 0.59, 0.55)  # xgb
+    # _, data["Kapitał modelu 10"] = calculate_earnings(df, test2y, model10_pred, 0.88, 0.56)  # xgb
+    # _, data["Kapitał modelu 11"] = calculate_earnings(df, test2y, model11_pred, 0.47, 0.44)  # xgb
+    # _, data["Kapitał modelu 12"] = calculate_earnings(df, test2y, model12_pred, 0.53, 0.53)  # xgb
+    # _, data["Kapitał modelu 13"] = calculate_earnings(df, test2y, model13_pred, 0.55, 0.51)  # xgb
     # print(data)
     # model1_pred = filter(model1_pred, 0.97, 0.48)
     # model2_pred = filter(model2_pred, 0.70, 0.54)
@@ -454,24 +454,24 @@ if __name__ == "__main__":
     # print(acc13)
     # print(acc14)
     # print(acc15)
-    data.index = pd.to_datetime(data.index, dayfirst=True).strftime("%d-%m")
-    my_colors = ["hotpink", "crimson","magenta","darkmagenta","indigo","blue","slategray",
-                 "steelblue","cyan","mediumspringgreen","yellow","orange","peru","black","tomato"]
-    # #
-    data.plot(y=["Kapitał modelu 1", "Kapitał modelu 2", "Kapitał modelu 3", "Kapitał modelu 4",
-                 "Kapitał modelu 5", "Kapitał modelu 6", "Kapitał modelu 7", "Kapitał modelu 8",
-                 "Kapitał modelu 9", "Kapitał modelu 10", "Kapitał modelu 11", "Kapitał modelu 12",
-                 "Kapitał modelu 13"], rot=45, grid=True,
-              ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
-                                                                      " czasu w dniach od 08-07-2022 do 18-09-2022",
-              color = my_colors)
-    plt.show()  # Depending on whether you use IPython or interactive mode, etc.
-
-    # plot_decisions(df, test2y, model4_pred, 0.73, 0.54)
-    # plot_decisions(plot_xgb, 0.41, 0.37)
-    model10_pred = filter(model10_pred, 0.88, 0.56)
-    model11_pred = filter(model11_pred, 0.47, 0.44)
-    plot_decisions('./data/BTC_tests3.csv', model10_pred)
-    plot_decisions('./data/BTC_tests3.csv', model11_pred)
+    # data.index = pd.to_datetime(data.index, dayfirst=True).strftime("%d-%m")
+    # my_colors = ["hotpink", "crimson","magenta","darkmagenta","indigo","blue","slategray",
+    #              "steelblue","cyan","mediumspringgreen","yellow","orange","peru","black","tomato"]
+    # # #
+    # data.plot(y=["Kapitał modelu 1", "Kapitał modelu 2", "Kapitał modelu 3", "Kapitał modelu 4",
+    #              "Kapitał modelu 5", "Kapitał modelu 6", "Kapitał modelu 7", "Kapitał modelu 8",
+    #              "Kapitał modelu 9", "Kapitał modelu 10", "Kapitał modelu 11", "Kapitał modelu 12",
+    #              "Kapitał modelu 13"], rot=45, grid=True,
+    #           ylabel="Wartość kapitału", xlabel="Data [DD-MM]", title="Wartość kapitału modeli w zależności od"
+    #                                                                   " czasu w dniach od 08-07-2022 do 18-09-2022",
+    #           color = my_colors)
+    # plt.show()  # Depending on whether you use IPython or interactive mode, etc.
+    #
+    # # plot_decisions(df, test2y, model4_pred, 0.73, 0.54)
+    # # plot_decisions(plot_xgb, 0.41, 0.37)
+    # model10_pred = filter(model10_pred, 0.88, 0.56)
+    # model11_pred = filter(model11_pred, 0.47, 0.44)
+    # plot_decisions('./data/BTC_tests3.csv', model10_pred)
+    # plot_decisions('./data/BTC_tests3.csv', model11_pred)
 
     # plot(file_name, test2y)

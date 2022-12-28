@@ -80,11 +80,10 @@ if __name__ == "__main__":
     #####################
     # XGBOOST
     # ####################
-    clf = xgb.XGBClassifier(max_depth=7, min_child_weight=8, learning_rate = 0.1, gamma=0.67, n_estimators=60,
-                            subsample=0.74, colsample_bytree=0.7, nthread=4, scale_pos_weight=1, seed=60)
+    clf = xgb.XGBClassifier(max_depth=6, min_child_weight=14, learning_rate = 0.1, gamma=0.76, n_estimators=60,
+                            subsample=0.53, colsample_bytree=0.33, nthread=4, scale_pos_weight=1, seed=60)
     parameters = {
-        'max_depth': [5,6,7,8,9,10,11,12,13,14],
-        'min_child_weight':[5,6,7,8,9,10,11,12,13,14]
+        'n_estimators': [10,20,30,40,50,60,70,80,90,100,120,140,160,180,200]
 
     }
     # grid = GridSearchCV(estimator=clf, param_grid=parameters, cv=10, scoring='f1_macro', n_jobs=-1, verbose=10)
@@ -96,17 +95,17 @@ if __name__ == "__main__":
     # accuracy = accuracy_score(y_test, y_pred)
     # print(accuracy * 100.0)
     # print("Accuracy: %.2f%%" % (accuracy * 100.0))
-    clf.save_model("xgb_12model4.txt")
+    clf.save_model("xgb_12model5.txt")
 
     #####################
     # ADABOOST
     # ####################
 
-    dt = DecisionTreeClassifier(max_depth = 13, max_features=11,min_samples_split=0.01,
+    dt = DecisionTreeClassifier(max_depth = 23, max_features=22,min_samples_split=0.1,
                                 random_state=1)
     params_dt = {
-        'max_depth': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
-        'max_features': [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+        'max_depth': [19,20,21,22,23,24,25],
+        'max_features': [19,20,21,22,23,24,25],
         'min_samples_split': [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
     }
     # print(dt.get_params())
@@ -125,9 +124,9 @@ if __name__ == "__main__":
         elif max_index == 2:
             y_train_vector.append(2)
     #
-    ada = AdaBoostClassifier(base_estimator=dt, n_estimators=190, random_state=1)
+    ada = AdaBoostClassifier(base_estimator=dt, n_estimators=420, random_state=1)
     #
-    # grid_ada = GridSearchCV(estimator=ada, param_grid={'n_estimators':[190,200,210,220,230,240]}, scoring='f1_macro', cv=10, n_jobs=-1, verbose=10)
+    # grid_ada = GridSearchCV(estimator=ada, param_grid={'n_estimators':[390,400,410,420,430,440,450]}, scoring='f1_macro', cv=10, n_jobs=-1, verbose=10)
     # grid_ada.fit(X_train, y_train_vector)
     # print(grid_ada.best_estimator_)
     # #
@@ -135,6 +134,6 @@ if __name__ == "__main__":
     # ada.fit(X_train, y_train_vector)
     # calibrated_clf = CalibratedClassifierCV(base_estimator=ada, method='sigmoid', cv='prefit')
     # calibrated_clf.fit(X_calib, y_calib)
-    # pickle.dump(ada, open("ada_12model14.sav", 'wb'))
+    # pickle.dump(ada, open("ada_12model15.sav", 'wb'))
     # pred =ada.predict_proba(X_calib)
     # print(pred)
