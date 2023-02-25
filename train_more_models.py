@@ -4,7 +4,7 @@ from get_dataset import scale_data
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-file_name = "./data/BTC_2021.csv"
+file_name = "./data/BTC_WMA_2021.csv"
 
 
 def make_folder(date1, date2):

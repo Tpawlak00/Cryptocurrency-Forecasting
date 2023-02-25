@@ -1,42 +1,36 @@
 import tensorflow as tf
-from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from get_dataset import scale_data, pred_length
-from datetime import datetime, timedelta
 import os
 
-file_name = "./data/BTC_2020.csv"
+file_name = "./data/BTC_WMA_2020.csv"
+
+
 
 def build_model():
-    model_name = tf.keras.models.Sequential()
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Conv1D(12, 3, activation='relu', input_shape=(4, 12), padding='same'))
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    # model.add(tf.keras.layers.Dropout(0.2))
+    # model.add(tf.keras.layers.Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.4))
+    # model.add(tf.keras.layers.LSTM(128, return_sequences=True))
+    # model.add(tf.keras.layers.Dense(512, activation='relu'))
+    # model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.LSTM(256))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dense(3, activation='softmax'))
 
-    model_name.add(tf.keras.layers.Conv1D(256, 3, input_shape=(pred_length, 1), activation='relu'))
-    model_name.add(tf.keras.layers.Dropout(0.3))
-    # model_name.add(tf.keras.layers.Conv1D(128, 2, activation='relu'))
-    # model_name.add(tf.keras.layers.Dropout(0.3))
-    model_name.add(tf.keras.layers.Dense(128, activation='relu'))
-    model_name.add(tf.keras.layers.Dropout(0.3))
-    # model_name.add(tf.keras.layers.Dropout(0.2))
-    # model_name.add(tf.keras.layers.LSTM(128, return_sequences=True))
-    # model_name.add(tf.keras.layers.Dropout(0.2))
-    model_name.add(tf.keras.layers.LSTM(256, return_sequences=True))
-    model_name.add(tf.keras.layers.Dropout(0.3))
-    model_name.add(tf.keras.layers.LSTM(128))
-    # model_name.add(tf.keras.layers.Dropout(0.2))
-    # model_name.add(tf.keras.layers.Flatten())
 
-    model_name.add(tf.keras.layers.Dense(128, activation='relu'))
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=['accuracy'])
+    model.summary()
 
-    # model_name.add(tf.keras.layers.Dropout(0.2))
-
-    model_name.add(tf.keras.layers.Dense(3, activation='softmax'))
-
-    model_name.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
-                       optimizer=tf.keras.optimizers.Adam(),
-                       metrics=['accuracy'])
-    model_name.summary()
-
-    return model_name
+    return model
 
 
 def make_folder(date1, date2):
@@ -59,21 +53,23 @@ def model_checkpoint(model_path):
 
 
 if __name__ == "__main__":
-
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     path = f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55'
     os.mkdir(path)
 
     inputs, outputs = scale_data(file_name)
     print(inputs)
+    print(inputs.shape)
     print(outputs)
+    print(outputs.shape)
 
     model = build_model()
     # model = tf.keras.models.load_model(f'{path}/Conv.h5')
-    history = model.fit(inputs, outputs, epochs=350, batch_size=512,
+    history = model.fit(inputs, outputs, epochs=700, batch_size=64,
                         validation_split=0.2,
                         verbose=1,
                         callbacks=[model_checkpoint(path)])
+    # print(history.history)
 
     plt.plot(history.history['accuracy'])
     plt.title('model accuracy')
