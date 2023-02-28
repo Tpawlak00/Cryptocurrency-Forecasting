@@ -69,79 +69,86 @@ def calculate_earnings(dataframe, predictions, buy_prob, sell_prob):
     df_check["action"] = bot_actions
 
     # calculate capital
-    bot_capital = 100
+    bot_capital = 1
     entry_price = 0
     position = ""
     bot_earnings = []
-    for i in range(len(df_check)):
-        if df_check["action"][i] == "B":
+    for i in range(dataframe.index[0], len(dataframe)+dataframe.index[0]):
+        if dataframe["target"][i] == "B":
             if position == "B":  # if we are already in long, check for stop loss
-                delta = (df_check["close"][i] - entry_price) / entry_price
+                delta = (dataframe["close"][i] - entry_price) / entry_price
 
                 if delta < -0.01:  # stop loss
-                    bot_capital += delta * 100
                     position = ""
+                    delta = delta + 1
+                    bot_capital = bot_capital*delta
                 bot_earnings.append(bot_capital)
                 continue
             elif position == "S":  # if we are in short position, close it and open long
-                delta = (entry_price - df_check["close"][i]) / entry_price
-                bot_capital += delta * 100
-                entry_price = df_check["close"][i]
-                bot_capital -= 0.03
+                delta = (entry_price - dataframe["close"][i]) / entry_price
+                delta = delta + 1
+                print(delta)
+                bot_capital = bot_capital * delta
+                entry_price = dataframe["close"][i]
+                bot_capital -= 0.0003
                 bot_earnings.append(bot_capital)
                 position = "B"
                 continue
             elif position == "":  # if we are not in any position open long
-                entry_price = df_check["close"][i]
-                bot_capital -= 0.03
+                entry_price = dataframe["close"][i]
+                bot_capital -= 0.0003
                 bot_earnings.append(bot_capital)
                 position = "B"
             continue
-        elif df_check["action"][i] == "H":
+        elif dataframe["target"][i] == "H":
             if position == "":
                 bot_earnings.append(bot_capital)
             elif position == "B":  # if we are in long, check for stop loss
-                delta = (df_check["close"][i] - entry_price) / entry_price
+                delta = (dataframe["close"][i] - entry_price) / entry_price
 
                 if delta < -0.01:  # stop loss
                     position = ""
-                    bot_capital += delta * 100
+                    delta = delta + 1
+                    bot_capital = bot_capital * delta
                 bot_earnings.append(bot_capital)
                 continue
 
             elif position == "S":  # if we are in short, check for stop loss
-                delta = (entry_price - df_check["close"][i]) / entry_price
+                delta = (entry_price - dataframe["close"][i]) / entry_price
 
                 if delta < -0.01:  # stop loss
                     position = ""
-                    bot_capital += delta * 100
+                    delta = delta + 1
+                    bot_capital = bot_capital * delta
                 bot_earnings.append(bot_capital)
                 continue
-        elif df_check["action"][i] == "S":
+        elif dataframe["target"][i] == "S":
             if position == "S":  # if we are in short, check for stop loss
-                delta = (entry_price - df_check["close"][i]) / entry_price
+                delta = (entry_price - dataframe["close"][i]) / entry_price
 
                 if delta < -0.01:  # stop loss
                     position = ""
-                    bot_capital += delta * 100
+                    delta = delta + 1
+                    bot_capital = bot_capital * delta
                 bot_earnings.append(bot_capital)
                 continue
             elif position == "B":  # if we are in long, close it and open short
-                delta = (df_check["close"][i] - entry_price) / entry_price
-                bot_capital += delta * 100
-                entry_price = df_check["close"][i]
-                bot_capital -= 0.03
+                delta = (dataframe["close"][i] - entry_price) / entry_price
+                delta = delta + 1
+                bot_capital = bot_capital * delta
+                entry_price = dataframe["close"][i]
+                bot_capital -= 0.0003
                 bot_earnings.append(bot_capital)
                 position = "S"
                 continue
             elif position == "":  # if we are not in any position, open short
-                entry_price = df_check["close"][i]
-                bot_capital -= 0.03
+                entry_price = dataframe["close"][i]
+                bot_capital -= 0.0003
                 bot_earnings.append(bot_capital)
                 position = "S"
                 continue
 
-    df_check["bot earnings"] = bot_earnings
+    dataframe["bot earnings"] = bot_earnings
 
     accuracy = df_check["bot earnings"][-1]
 
@@ -156,9 +163,9 @@ def find_best_prob(x_pred):
     i_list = []
     j_list = []
     print(x_pred)
-    for i in range(45, 100):
+    for i in range(30, 100):
         print(i)
-        for j in range(45, 100):
+        for j in range(30, 100):
             to_add, _ = calculate_earnings(df, x_pred, i/100, j/100)
             acc_list.append(to_add)
             i_list.append(i)

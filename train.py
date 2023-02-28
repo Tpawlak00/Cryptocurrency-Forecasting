@@ -2,26 +2,27 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from get_dataset import scale_data, pred_length
 import os
+from sklearn.model_selection import GridSearchCV
+from keras.wrappers.scikit_learn import KerasClassifier
+import numpy as np
 
-file_name = "./data/BTC_WMA_2020.csv"
+file_name = "./data/dolar_bar_2020-2021.csv"
 
 
 
 def build_model():
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Conv1D(12, 3, activation='relu', input_shape=(4, 12), padding='same'))
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    # model.add(tf.keras.layers.Dropout(0.2))
-    # model.add(tf.keras.layers.Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(tf.keras.layers.Conv1D(256, 3, activation='relu', input_shape=(4, 12), padding='same'))
     model.add(tf.keras.layers.Dense(128, activation='relu'))
-    model.add(tf.keras.layers.Dropout(0.4))
-    # model.add(tf.keras.layers.LSTM(128, return_sequences=True))
-    # model.add(tf.keras.layers.Dense(512, activation='relu'))
-    # model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.Conv1D(128, 2, activation='relu', input_shape=(4, 12), padding='same'))
+    model.add(tf.keras.layers.Dense(512, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.7))
+    # model.add(tf.keras.layers.LSTM(256, return_sequences=True))
+    model.add(tf.keras.layers.Dense(256, activation='relu'))
     model.add(tf.keras.layers.LSTM(256))
+    model.add(tf.keras.layers.Dense(256, activation='relu'))
+    model.add(tf.keras.layers.Dropout(0.7))
     model.add(tf.keras.layers.Dense(128, activation='relu'))
-    model.add(tf.keras.layers.Dropout(0.3))
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
     model.add(tf.keras.layers.Dense(3, activation='softmax'))
 
 
@@ -56,20 +57,24 @@ if __name__ == "__main__":
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     path = f'./saved_model/From 3-16-2020 23-35 To 12-31-2020 23-55'
     os.mkdir(path)
+    # class_weight = {0: 1.0, 1: 10.0, 2: 10.0}  # Ustawienie wag dla klas
+
 
     inputs, outputs = scale_data(file_name)
     print(inputs)
     print(inputs.shape)
     print(outputs)
     print(outputs.shape)
+    class_freq = np.sum(outputs, axis=0) / outputs.shape[0]
+    class_weight = {i: 1.0 / class_freq[i] for i in range(len(class_freq))}
+    print(class_weight)
 
     model = build_model()
-    # model = tf.keras.models.load_model(f'{path}/Conv.h5')
-    history = model.fit(inputs, outputs, epochs=700, batch_size=64,
+
+    history = model.fit(inputs, outputs, epochs=1000, batch_size=16,
                         validation_split=0.2,
                         verbose=1,
-                        callbacks=[model_checkpoint(path)])
-    # print(history.history)
+                        callbacks=[model_checkpoint(path)], class_weight=class_weight)
 
     plt.plot(history.history['accuracy'])
     plt.title('model accuracy')
